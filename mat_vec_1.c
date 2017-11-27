@@ -29,7 +29,7 @@ void *multiply_row(void *arg_struct){
 
     /* Perform multiplication */
     for (i = start; i < endRow; i++) {
-        for (j = start; j < endRow; j++) {
+        for (j = 0; j < N; j++) {
             x[i] += a[i][j] * b[j];
         }
     }
@@ -94,7 +94,6 @@ int main (int argc, char *argv[] )    {
         /* Build arguments for this particular thread */
         if (i == numThreads - 1) {
             arguments[i].numRows = rowsPerThread + extraRows;
-            printf("number of rows: %d\n",arguments[i].numRows);
         } else {
             arguments[i].numRows = rowsPerThread;
         }
@@ -103,18 +102,16 @@ int main (int argc, char *argv[] )    {
         pthread_create(&threads[i], NULL, multiply_row, &arguments[i]);
     }
 
-    printf("Waiting...\n");
     for (i = 0; i < numThreads; i++) {
         pthread_join(threads[i], NULL);
     }
-    printf("Done Waiting.\n");
 
     gettimeofday (&tv ,  &tz);
     time_end = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
 
     /* this is for checking the results */
     for (i=0; i<N; i+=N/10) {
-        printf(" %10.6f",x[i]);
+        printf(" %10.6f", i, x[i]);
     }
     printf("\n");
     printf ("time = %lf\n", time_end - time_start);
