@@ -1,0 +1,8 @@
+In mat_vec_1, the benefits of threading were very apparent.  On the first run, with P=1 there was no benefit. In fact, it was even slower due to the
+overhead of creating the threads.  After this however, the benefits increased as P increased.  The greatest increase that I saw was when P=16, N=4000.
+This created a speedup of 13.7 when compared with the original mat_vec.  This was surprising to me, but the result was consistent over several runs of the
+same trial.  mat_vec_1 clearly showed the benefits of proper threading in a multi-core system.
+
+In mat_vec_2, the results were not quite as beneficial.  In fact, there was not a single speedup over 1 throughout any of the trials.  This was due to the
+overhead of creating the threads as well as the mutex locking/unlocking. Unfortunately this was not a very efficient algorithm for solving the problem of
+matrix multiplication with multi-threading.
