@@ -14,24 +14,31 @@ int N;
 float **a;
 float *b;
 float *x;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct thread_argument {
-    int rowStart;
-    int numRows;
+    int colStart;
+    int numColumns;
 };
 
 
 void *multiply_row(void *arg_struct){
     struct thread_argument *sent_args = arg_struct;
     int i, j;
-    int start = sent_args->rowStart;
-    int endRow= start + sent_args->numRows;
+    int start = sent_args->colStart;
+    int endColumn = start + sent_args->numColumns;
 
     /* Perform multiplication */
-    for (i = start; i < endRow; i++) {
-        for (j = 0; j < N; j++) {
+    /*
+        For each column, go through each row multiplying one element
+        and storing it in the corresponding row in the result vector
+    */
+    for (j = start; j < endColumn; j++) {
+        pthread_mutex_lock(&mutex);
+        for (i = 0; i < N; i++) {
             x[i] += a[i][j] * b[j];
         }
+        pthread_mutex_unlock(&mutex);
     }
 }
 
@@ -48,7 +55,7 @@ int main (int argc, char *argv[] )    {
     double time_start, time_end;
     struct timeval tv;
     struct timezone tz;
-    int rowsPerThread, extraRows;
+    int colsPerThread, extraCols;
 
     /* allocate arrays dynamically */
     a = malloc(sizeof(float*)*N);
@@ -82,22 +89,22 @@ int main (int argc, char *argv[] )    {
 
     /* Determine number of rows to be handled by each thread */
     if (N % numThreads == 0) {
-        rowsPerThread = N / numThreads;
-        extraRows = 0;
+        colsPerThread = N / numThreads;
+        extraCols = 0;
     } else {
         /* N is NOT evenly divisible by P */
-        extraRows = N % numThreads;
-        rowsPerThread = (N - extraRows) / numThreads;
+        extraCols = N % numThreads;
+        colsPerThread = (N - extraCols) / numThreads;
     }
 
     for (i = 0; i < numThreads; i++) {
         /* Build arguments for this particular thread */
         if (i == numThreads - 1) {
-            arguments[i].numRows = rowsPerThread + extraRows;
+            arguments[i].numColumns= colsPerThread + extraCols;
         } else {
-            arguments[i].numRows = rowsPerThread;
+            arguments[i].numColumns = colsPerThread;
         }
-        arguments[i].rowStart = i*rowsPerThread;
+        arguments[i].colStart = i*colsPerThread;
 
         pthread_create(&threads[i], NULL, multiply_row, &arguments[i]);
     }

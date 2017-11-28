@@ -1,4 +1,6 @@
-mat_vec*
+mat_vec
+mat_vec_1
+mat_vec_2
 # Prerequisites
 *.d
 

@@ -60,5 +60,4 @@ int main (int argc, char *argv[] )    {
   for (i=0; i<N; i+=N/10) { printf(" %10.6f",x[i]); }
   printf("\n");
   printf ("time = %lf\n", time_end - time_start);
-
 }

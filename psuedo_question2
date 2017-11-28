@@ -1,0 +1,45 @@
+/*
+    John Dott
+    **Psuedocode to answer Question 2 of Homework 5 for COE 1541: Computer Architecture in Fall 2017**
+
+    Assumptions:
+        - Pn is the identifier of the current thread, which are identified beginning at 0 and ending at P-1
+        - Proper error and special case (e.g. N not divisible by P) would be handling would be included in a true
+          implementation of this assignment
+*/
+
+Sum = 0;
+
+numSums = (N / P);
+
+// Each processor sums numSums elements, which are stored
+// locally to each processor in the variable A[]
+for (i = 0; i < numSums; i++){
+    Sum = Sum + A[i];
+}
+
+Half = P / 2;
+
+// There will be log_2(P) levels of "recursion"
+for (i = 0; i < log_2(P); i++) {
+    if (Pn < 2*Half) && (Pn >= Half) {
+        send (Sum, Pn – Half );
+    }
+
+    if (Pn < Half ) {
+        receive (remote_sum);
+        Sum =+ remote_sum ;
+    }
+    Half = Half / 2;
+}
+
+if(Pn == 0)
+    for (i = 0; i < P; i++){
+        // Send the final sum to each processor
+        send(Sum, i);
+    }
+} else {
+    // All other processors receive the final sum
+    receive(final_sum);
+    Sum = final_sum;
+}
